@@ -61,6 +61,17 @@ For workflows, orchestration mode is a second-level choice drawn from [Anthropic
 
 ## What's in the box
 
+The skill itself is the `agentic-principle/` subdirectory — that is the unit of distribution. The READMEs at the repo root are not part of it.
+
+```
+agentic-principle/
+├── SKILL.md
+└── references/
+    ├── agent-construction.md
+    ├── system-prompt-blocks.md
+    └── design-doc-template.md
+```
+
 | File | Contents |
 |---|---|
 | `SKILL.md` | Entry point. Classification, workflow, core principles, per-scenario checklists, hard prohibitions |
@@ -73,13 +84,14 @@ Tool names throughout are written as **capability classes** (file read, content 
 ## Install
 
 ```bash
-git clone <this-repo> ~/.claude/skills/agentic-principle
+git clone git@github.com:weidwonder/agentic_principle.git
+cp -r agentic_principle/agentic-principle ~/.claude/skills/
 ```
 
-Or keep the source wherever you develop skills and symlink it:
+Or keep the clone where you develop and symlink the subdirectory, so `git pull` updates the installed skill:
 
 ```bash
-ln -s /path/to/agentic_principle ~/.claude/skills/agentic-principle
+ln -s "$PWD/agentic_principle/agentic-principle" ~/.claude/skills/agentic-principle
 ```
 
 The skill directory is self-contained — no CLI, no dependencies, no login.

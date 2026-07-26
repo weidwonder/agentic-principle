@@ -61,6 +61,17 @@
 
 ## 目录里有什么
 
+skill 本体是 `agentic-principle/` 子目录，它才是分发单位；仓库根目录的两份 README 不属于 skill。
+
+```
+agentic-principle/
+├── SKILL.md
+└── references/
+    ├── agent-construction.md
+    ├── system-prompt-blocks.md
+    └── design-doc-template.md
+```
+
 | 文件 | 内容 |
 |---|---|
 | `SKILL.md` | 入口。场景分类、工作流、基础原则、各场景确认清单、绝对禁止条目 |
@@ -73,13 +84,14 @@
 ## 安装
 
 ```bash
-git clone <本仓库> ~/.claude/skills/agentic-principle
+git clone git@github.com:weidwonder/agentic_principle.git
+cp -r agentic_principle/agentic-principle ~/.claude/skills/
 ```
 
-或者把源码放在你惯用的 skill 开发目录，软链过去：
+或者把 clone 留在你惯用的开发目录，软链子目录过去，这样 `git pull` 就能直接更新已安装的 skill：
 
 ```bash
-ln -s /path/to/agentic_principle ~/.claude/skills/agentic-principle
+ln -s "$PWD/agentic_principle/agentic-principle" ~/.claude/skills/agentic-principle
 ```
 
 skill 目录自包含——无 CLI、无依赖、无需登录。
