@@ -28,9 +28,11 @@ None of these are prompt-engineering problems. They are architecture and scoping
 
 **A mandatory completeness scan.** Before you show anyone a design, you walk every agent node and verify it can actually reach the rules it needs for every judgment it makes. Gaps go to the user as a list. Inventing a business rule to fill a gap is a hard prohibition, not a preference.
 
+**A mandatory attention-load check.** The other half of the pair: walk every agent against hard limits — how long the prompt runs, how much optional material is stuffed into turn one, how many scenarios one agent has to juggle, whether key intermediate conclusions live only in conversation history. Cross a limit and you must act: push down, split, route, or checkpoint. Relief comes from moving information to another layer or splitting responsibilities — **never from deleting a rule the agent needs to judge with**.
+
 **A two-track sign-off.** Structured questions in batches of four, then a design doc with a flow diagram for final review. The design is not "agreed" until someone says so, and the skill records where and when.
 
-**A review mode.** Point it at an existing implementation and it derives an independent design *first*, then diffs — so you catch the scenario-selection mistakes that a straight code read would anchor you past.
+**A review mode.** Point it at an existing implementation and it derives an independent design *first*, then diffs — so you catch the scenario-selection mistakes that a straight code read would anchor you past. The diff includes an attention-load assessment: issues come with evidence, **you confirm they are real issues first**, and only then does it propose improvements. It never edits your implementation on its own.
 
 ## The classification
 
@@ -56,6 +58,7 @@ For workflows, orchestration mode is a second-level choice drawn from [Anthropic
 | 1 | Scenario classification, then take the lowest viable rung of the complexity ladder |
 | 2 | Draft the design in-session. Nothing written to disk yet |
 | 2.5 | **Information completeness scan** — every agent node, no sampling. Produces a gap list |
+| 2.6 | **Attention-load check** — every agent against hard limits; crossings get pushed down, split, routed, or checkpointed |
 | 3 | Two-track sign-off: batched questions, then design doc for final review |
 | 4 | Implement or diff against the existing system. Live-test every agent before calling it done |
 
