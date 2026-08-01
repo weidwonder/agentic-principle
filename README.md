@@ -30,6 +30,10 @@ None of these are prompt-engineering problems. They are architecture and scoping
 
 **A mandatory attention-load check.** The other half of the pair: walk every agent against hard limits — how long the prompt runs, how much optional material is stuffed into turn one, how many scenarios one agent has to juggle, whether key intermediate conclusions live only in conversation history. Cross a limit and you must act: push down, split, route, or checkpoint. Relief comes from moving information to another layer or splitting responsibilities — **never from deleting a rule the agent needs to judge with**.
 
+**No long deliverable written in one shot.** Once the output gets long, it becomes: code pre-builds the template → the agent edits it section by section → code validates. No hitting the single-response output cap, attention stays on one section per turn, a mistake costs one section instead of the whole document, and the template itself pins down what must be there — code names what's missing. Multi-agent and multi-step workflows are orchestrated this way by default: template and section table first, then who fills which section.
+
+**Every step verifiable on its own.** End-to-end passing is not tested — it tells you *something* broke, not *which step* broke, and agentic errors propagate down the chain and get papered over by the next node's improvisation. So every step of a workflow or parent-child system gets its own case; anything assertable in code is asserted in code; unstructured output goes to a dedicated judge agent returning structured verdicts with evidence, every rubric item anchored to a score, and **the judge is calibrated against human-labeled samples before it counts**. At scale, build an eval set, run it in code for a pass rate, and turn every fixed defect into a regression sample.
+
 **A two-track sign-off.** Structured questions in batches of four, then a design doc with a flow diagram for final review. The design is not "agreed" until someone says so, and the skill records where and when.
 
 **A review mode.** Point it at an existing implementation and it derives an independent design *first*, then diffs — so you catch the scenario-selection mistakes that a straight code read would anchor you past. The diff includes an attention-load assessment: issues come with evidence, **you confirm they are real issues first**, and only then does it propose improvements. It never edits your implementation on its own.
@@ -58,9 +62,10 @@ For workflows, orchestration mode is a second-level choice drawn from [Anthropic
 | 1 | Scenario classification, then take the lowest viable rung of the complexity ladder |
 | 2 | Draft the design in-session. Nothing written to disk yet |
 | 2.5 | **Information completeness scan** — every agent node, no sampling. Produces a gap list |
-| 2.6 | **Attention-load check** — every agent against hard limits; crossings get pushed down, split, routed, or checkpointed |
+| 2.6a | **Input-side attention-load check** — every agent against hard limits; crossings get pushed down, split, routed, or checkpointed |
+| 2.6b | **Output-side construction check** — deliverables hitting the long-artifact criteria get a section table and code-side validation rules on the spot |
 | 3 | Two-track sign-off: batched questions, then design doc for final review |
-| 4 | Implement or diff against the existing system. Live-test every agent before calling it done |
+| 4 | Implement or diff against the existing system. Live-test every agent and run per-step cases before calling it done |
 
 ## What's in the box
 
@@ -72,7 +77,10 @@ agentic-principle/
 └── references/
     ├── agent-construction.md
     ├── system-prompt-blocks.md
-    └── design-doc-template.md
+    ├── design-doc-template.md
+    ├── long-artifact.md
+    ├── testing.md
+    └── review-mode.md
 ```
 
 | File | Contents |
@@ -81,6 +89,9 @@ agentic-principle/
 | `references/agent-construction.md` | Six-element prompt template, writing rules, minimum capability sets, live-test procedure |
 | `references/system-prompt-blocks.md` | 12 reusable system-prompt blocks with an applicability matrix. One is mandatory |
 | `references/design-doc-template.md` | Authoritative question batches, design doc skeleton, flow diagram conventions |
+| `references/long-artifact.md` | Three-step method for long deliverables, how to split sections, worked example |
+| `references/testing.md` | Per-layer execution notes, per-step cases, judge agents and rubrics, batch eval and gating |
+| `references/review-mode.md` | The four review assessments, evidence requirements, boundaries |
 
 Tool names throughout are written as **capability classes** (file read, content search, path match, write, command execution, network, sub-agent dispatch), not as any one harness's tool names. Map them to whatever your environment actually calls them.
 
