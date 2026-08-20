@@ -121,7 +121,7 @@ date: 'YYYY-MM-DD'
 status: '待用户确认 | 已确认 | 已实现'
 documentRole: 'spec'
 sourceOfTruth: '../REQUIREMENTS.md'
-skillVersion: '0.6.0'
+skillVersion: '<填 SKILL.md frontmatter 的 metadata.version>'
 ---
 
 # <功能名> — Agentic 方案设计

@@ -65,6 +65,16 @@ None of these are prompt-engineering problems. They are architecture and scoping
 
 It never edits your implementation on its own.
 
+**A debug mode.** When a shipped agent starts misbehaving — drifting, skipping the tool it should call, producing conclusions out of thin air, refusing to stop, failing intermittently — there's a fourth entry for exactly that, and it does one thing first: **read the transcript before guessing**.
+
+- **The transcript is the only first-hand evidence.** Code, prompt templates, config, and application logs all tell you what *should* have happened; the transcript tells you what the model actually saw and decided on — and the two disagreeing is itself the single most common root cause. When there is no transcript, the first action is to add one and reproduce, not to keep guessing; and that gap gets registered as P0 on its own, because **without a readable transcript every future anomaly in this system can only be guessed at**.
+- **Denoise into a skeleton timeline before reading.** A real run is tens of thousands to hundreds of thousands of tokens; reading it raw fills your own context and forces you to sample — and sampling is exactly what makes you miss the root cause. So drop thinking bodies, tool arguments, and tool return bodies, and keep **role, turn number, tool name, success/failure, size, `stop_reason`, and an argument fingerprint** — one screen, start to finish. That fingerprint is the highest-value derived field here: it makes "same tool, same arguments, over and over" visible at a glance, which the tool name alone never shows.
+- **Read forward from the top for the first deviation, never backward from the error.** Agentic errors get carried and amplified turn over turn: a field misread at turn 5 surfaces as a very confident wrong conclusion at turn 30. The turn that errored is usually just the last domino, and the code there is usually fine.
+- **Deviations come in three kinds**: **input deviation** (what the model actually saw that turn was already wrong — anyone would have gotten it wrong), **decision deviation** (the information was there, the judgment wasn't), **execution deviation** (the call was right, the action didn't land or the result never came back). Diagnosing an input deviation **requires looking at the request actually sent that turn**, not the template and not the config: an unrendered variable, context trimmed away, a tool that never made it into the `tools` list — none of that is visible in the template. **Most cases filed as "the model won't follow instructions" are input deviations.**
+- **Then attribute across four layers**: harness (your own prompt assembly, context trimming, tool registration, loop control — the highest-hit layer by far), provider (model version, rate limits, truncation, format changes), external programs (MCP servers, business APIs, databases, sandboxes), and only last, the design itself. The order matters: opening with a read of the prompt will nearly always "find something," and then you edit the prompt, the anomaly happens not to reproduce, the root cause is buried, and it comes back unchanged on the next input.
+- Hence one hard prohibition: **no prompt edits to stop the bleeding before you've read the transcript.** By the same token, "it stopped reproducing after I changed the prompt" does not count as a diagnosis.
+- **Four things to close out**: state the layer and the evidence, map the root cause back to D1–D11 for a disposition, add a regression case, and say plainly which conclusions are still `unknown`. If the root cause is "that dimension was simply never built," it isn't an intermittent fault — it's an architecture defect, so escalate to review or redesign instead of patching in place.
+
 ## The classification
 
 | Question (top-down, first match wins) | Scenario | Example |
@@ -92,7 +102,7 @@ For workflows, orchestration mode is a second-level choice drawn from [Anthropic
 | 3 | Two-track sign-off: batched questions, then design doc for final review |
 | 4 | Implement or diff against the existing system. Live-test every agent and run per-step cases before calling it done |
 
-Three entries: **new build** runs the full flow; **incremental** (adding a skill / tool / service to an existing platform) runs the trimmed inheritance-declaration + gap-list path; **review** derives an independent design first, then diffs.
+Four entries: **new build** runs the full flow; **incremental** (adding a skill / tool / service to an existing platform) runs the trimmed inheritance-declaration + gap-list path; **review** derives an independent design first, then diffs; **debug** (a shipped agent with a concrete anomaly) skips these steps entirely and goes straight to the transcript.
 
 ## The dimension matrix
 
@@ -130,13 +140,13 @@ agentic-principle/
 │   ├── runtime/         agent-loop.md, reliability.md, memory.md, cost-and-cache.md
 │   ├── safety/          safety.md
 │   ├── delivery/        design-doc-template.md, long-artifact.md, testing.md
-│   └── modes/           review-mode.md, incremental.md
+│   └── modes/           review-mode.md, incremental.md, debug-mode.md
 └── scripts/             scan_agent.py (optional)
 ```
 
 | File | Dim | Contents |
 |---|---|---|
-| `SKILL.md` | — | Entry point. Three entries, classification, dimension matrix, core principles, checklists, hard prohibitions |
+| `SKILL.md` | — | Entry point. Four entries, classification, dimension matrix, core principles, checklists, hard prohibitions |
 | `prompt/agent-construction.md` | D2 | Six-element template, writing rules, context layering and attention red lines, minimum capability sets, autonomy labeling, live tests, model selection |
 | `prompt/system-prompt-blocks.md` | — | 13 reusable system-prompt blocks with an applicability matrix. One is mandatory |
 | `tools/tool-design.md` | — | Packaging choice, tool-description standards, foolproofing, server-side truth, **the coverage argument for heuristic rules** |
@@ -152,6 +162,7 @@ agentic-principle/
 | `delivery/testing.md` | D11 | The three test layers, per-step cases, judge agents and rubrics, batch eval and gating |
 | `modes/review-mode.md` | — | Audit-mode determination, per-dimension assessment with evidence status, contradiction pass, evidence requirements, scanner discipline |
 | `modes/incremental.md` | — | Incremental entry criteria and fallback signals, inheritance declaration, delta-only spec, platform gap list |
+| `modes/debug-mode.md` | — | Transcript acquisition checklist, skeleton-timeline denoising, the three kinds of first deviation, four-layer attribution table, close-out and regression case |
 | `scripts/scan_agent.py` | — | An **optional** accelerator for reviewing unfamiliar repos: per-dimension evidence gaps plus risk leads. Leads only, never verdicts |
 
 Tool names throughout are written as **capability classes** (file read, content search, path match, write, command execution, network, sub-agent dispatch), not as any one harness's tool names. Map them to whatever your environment actually calls them.
@@ -179,6 +190,7 @@ Say what you want in plain language:
 - "Should this be a workflow or should the agent dispatch sub-agents?"
 - "Add a tool to our ops agent that can change production config"
 - "Review the agent system we shipped last quarter"
+- "This agent keeps skipping the tool and just making things up — help me figure out why"
 
 The skill will classify the scenario, tell you its reasoning, and start asking. Expect it to push back if your idea is over-engineered — and expect it to say so plainly if the answer is "this should just be a script."
 
