@@ -73,7 +73,7 @@ It never edits your implementation on its own.
 - **Deviations come in three kinds**: **input deviation** (what the model actually saw that turn was already wrong — anyone would have gotten it wrong), **decision deviation** (the information was there, the judgment wasn't), **execution deviation** (the call was right, the action didn't land or the result never came back). Diagnosing an input deviation **requires looking at the request actually sent that turn**, not the template and not the config: an unrendered variable, context trimmed away, a tool that never made it into the `tools` list — none of that is visible in the template. **Most cases filed as "the model won't follow instructions" are input deviations.**
 - **Then attribute across four layers**: harness (your own prompt assembly, context trimming, tool registration, loop control — the highest-hit layer by far), provider (model version, rate limits, truncation, format changes), external programs (MCP servers, business APIs, databases, sandboxes), and only last, the design itself. The order matters: opening with a read of the prompt will nearly always "find something," and then you edit the prompt, the anomaly happens not to reproduce, the root cause is buried, and it comes back unchanged on the next input.
 - Hence one hard prohibition: **no prompt edits to stop the bleeding before you've read the transcript.** By the same token, "it stopped reproducing after I changed the prompt" does not count as a diagnosis.
-- **Four things to close out**: state the layer and the evidence, map the root cause back to D1–D11 for a disposition, add a regression case, and say plainly which conclusions are still `unknown`. If the root cause is "that dimension was simply never built," it isn't an intermittent fault — it's an architecture defect, so escalate to review or redesign instead of patching in place.
+- **Four things to close out**: state the layer and the evidence, map the root cause back to D1–D12 for a disposition, add a regression case, and say plainly which conclusions are still `unknown`. If the root cause is "that dimension was simply never built," it isn't an intermittent fault — it's an architecture defect, so escalate to review or redesign instead of patching in place.
 
 ## The classification
 
@@ -121,6 +121,7 @@ Design-side checks and review-side assessments run off this one table — a sing
 | D9 | Cost and performance | At scale, or under budget/latency constraints | No per-task cost or time ceiling; averages tracked instead of p95/p99 |
 | D10 | Multi-agent chain | 2+ agents | No single-agent baseline comparison; handoffs dropping acceptance criteria; reviewers denied the original evidence |
 | D11 | Testing and evaluation | Always | Multi-node systems with only end-to-end tests; judge agent never calibrated against human labels |
+| D12 | Observability and replay | Always | Observing anything requires a code change; nothing but the skeleton survives with debug mode off; only the final artifact is captured, no per-step slices; no way to replay a single step |
 
 Adding a dimension is now one more row. That was the point of this refactor: these used to be `2.5 / 2.6a / 2.6b / 2.6c / 2.7`, a numbering scheme that got uglier with every addition.
 
@@ -137,7 +138,7 @@ agentic-principle/
 │   ├── prompt/          agent-construction.md, system-prompt-blocks.md
 │   ├── tools/           tool-design.md, tool-output.md
 │   ├── multi-agent/     multi-agent.md
-│   ├── runtime/         agent-loop.md, reliability.md, memory.md, cost-and-cache.md
+│   ├── runtime/         agent-loop.md, reliability.md, memory.md, cost-and-cache.md, observability.md
 │   ├── safety/          safety.md
 │   ├── delivery/        design-doc-template.md, long-artifact.md, testing.md
 │   └── modes/           review-mode.md, incremental.md, debug-mode.md
@@ -156,6 +157,7 @@ agentic-principle/
 | `runtime/reliability.md` | D7 | Four error classes, backoff, lack-of-progress detection, circuit breakers and global budgets, idempotency, partial-failure rollback and reconciliation |
 | `runtime/memory.md` | D8 | Five state classes, write criteria, memory metadata, retrieval isolation, correction/expiry/deletion, knowledge-update process, redaction |
 | `runtime/cost-and-cache.md` | D9 | Accounting scope, three budget levels, latency percentiles, end-to-end optimization, **cache-friendly layout and the compression fidelity contract** |
+| `runtime/observability.md` | D12 | The four debug-mode switch contracts, per-step slice fields, single-step replay, redaction and retention, seams with D11 and debugging |
 | `safety/safety.md` | D5 | Trust tiers, the two places injection defense must land, output verdict codes, fail-closed, the four autonomy levels and approval gates |
 | `delivery/design-doc-template.md` | — | Authoritative question batches, design doc skeleton, incremental skeleton, flow diagram conventions |
 | `delivery/long-artifact.md` | D3 | Long-artifact criteria, three-step method, how to split sections, worked example |

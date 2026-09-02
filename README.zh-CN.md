@@ -73,7 +73,7 @@
 - **偏离分三类**：**输入偏离**（这一轮它实际看到的东西就是错的——换谁都会判错）、**决策偏离**（信息给到了，判断没做对）、**执行偏离**（想对了，动作没生效或结果没回来）。判输入偏离**必须看那一轮实际发出的 request**，不是模板、不是配置文件：变量没渲染、上下文被裁剪切掉、工具压根没进 `tools` 清单——这些在模板里全都看不见。**多数被归因为"模型不听话"的案例，实际是输入偏离。**
 - **然后分四层归因**：harness（你自己的提示词拼装、上下文裁剪、工具注册、loop 控制——命中率最高的一层）、供应商（模型版本、限流、截断、格式变更）、外部程序（MCP server、业务 API、DB、沙箱）、最后才是设计本身。顺序有讲究：一上来就读提示词找毛病几乎总能"找到点什么"，然后你改了提示词、异常碰巧不复现，根因被埋进去，下次换个输入原样复发。
 - 所以有一条硬禁止：**没读过对话记录不许改提示词止血**。同理，"改了提示词就不复现了"不算定位。
-- **收口四件事**：归因写明层与证据、映射回 D1–D11 给处置、补一条回归用例、如实说明哪些结论仍是 `unknown`。根因要是落在"这一维压根没做"，那它就不是偶发故障而是架构缺陷——升级为评审或重新设计，不要就地打补丁。
+- **收口四件事**：归因写明层与证据、映射回 D1–D12 给处置、补一条回归用例、如实说明哪些结论仍是 `unknown`。根因要是落在"这一维压根没做"，那它就不是偶发故障而是架构缺陷——升级为评审或重新设计，不要就地打补丁。
 
 ## 场景分类
 
@@ -121,6 +121,7 @@
 | D9 | 成本与性能 | 上规模或有预算/延迟约束 | 无任务级成本或时间上限；只看均值不看 p95/p99 |
 | D10 | 多 Agent 链路 | ≥ 2 个 Agent | 未与单 Agent 基线对比；handoff 丢失验收标准；评审者拿不到原始证据 |
 | D11 | 测试与评测 | 全部 | 多节点场景只有端到端测试；评测 Agent 未用人工标注样本校准 |
+| D12 | 可观测与回放 | 全部 | 要改代码才能观察；关闭调试模式后连骨架都不留；只留末端产物、中间环节无切片；无法只回放某一个环节 |
 
 新增一个维度只是往表里加一行——这是这一版重构的主要目的：以前它们是 `2.5 / 2.6a / 2.6b / 2.6c / 2.7` 这样一串越排越畸形的编号。
 
@@ -137,7 +138,7 @@ agentic-principle/
 │   ├── prompt/          agent-construction.md, system-prompt-blocks.md
 │   ├── tools/           tool-design.md, tool-output.md
 │   ├── multi-agent/     multi-agent.md
-│   ├── runtime/         agent-loop.md, reliability.md, memory.md, cost-and-cache.md
+│   ├── runtime/         agent-loop.md, reliability.md, memory.md, cost-and-cache.md, observability.md
 │   ├── safety/          safety.md
 │   ├── delivery/        design-doc-template.md, long-artifact.md, testing.md
 │   └── modes/           review-mode.md, incremental.md, debug-mode.md
@@ -156,6 +157,7 @@ agentic-principle/
 | `runtime/reliability.md` | D7 | 错误四分类、退避、无进展检测、熔断与全局预算、幂等、部分失败的回滚与对账 |
 | `runtime/memory.md` | D8 | 五类状态分离、写入判据、记忆元数据、检索隔离、更正过期删除、知识更新流程、脱敏 |
 | `runtime/cost-and-cache.md` | D9 | 计量口径、三级预算、延迟分位、优化端到端评估、**缓存友好布局与压缩保真契约** |
+| `runtime/observability.md` | D12 | 调试模式开关四契约、每环节切片字段、单环节回放、脱敏与留存、与 D11/排障的接缝 |
 | `safety/safety.md` | D5 | 信任分级、注入防护的两处落地、输出侧判定码、fail-closed、自主级别四档与审批闸门 |
 | `delivery/design-doc-template.md` | — | 权威提问批次、设计文档骨架、增量骨架、流程图写法 |
 | `delivery/long-artifact.md` | D3 | 长产物判据、三步做法、分区划法、完整示例 |

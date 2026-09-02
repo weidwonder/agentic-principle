@@ -160,6 +160,16 @@ DIMENSION_SIGNALS: Dict[str, Dict[str, Any]] = {
         "means": "没有测试、评测集或断言的痕迹",
         "ref": "references/delivery/testing.md",
     },
+    "D12 可观测与回放": {
+        "pattern": re.compile(
+            r"\b(debug[_-]?mode|verbose[_-]?mode|replay|re[_-]?run[_-]?step|"
+            r"snapshot|step[_-]?dump|trace[_-]?dump|transcript|record[_-]?run|"
+            r"run[_-]?id|step[_-]?id)\b",
+            re.IGNORECASE,
+        ),
+        "means": "没有调试模式、切片留存或回放入口的痕迹",
+        "ref": "references/runtime/observability.md",
+    },
 }
 
 
