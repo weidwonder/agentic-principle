@@ -1,6 +1,6 @@
 ---
 name: agentic-principle
-description: 设计、编排与评审 Agentic 系统的架构原则。判断一个需求该做成纯程序、单 Agent Chat、单 Agentic、父子 Agentic 还是 Agentic 工作流，并据此设计系统提示词、工具与 Skill 体系、多 Agent 协作链路、运行时边界（终止条件、步数与成本上限、重试与幂等、记忆与租户隔离、延迟与成本预算）、安全边界（自主级别、审批闸门、注入防护）与测试评测方案；也用于在既有平台上增量新增 skill 或工具、Review 已实现的 Agent 项目，以及定位已上线 Agent 的行为异常。当用户提到 设计或编排 agent、多 agent 协作、子代理拆解、agentic 工作流、agent loop 或 harness 工程、agent 架构选型、系统提示词设计、agent 提示词太长或注意力涣散、agent 停不下来或死循环、agent 重试与超时与幂等、agent 记忆或 RAG 怎么设计、多租户数据隔离、token 成本与延迟预算、agent 输出被截断、工具或 MCP 返回太长吃满上下文、agent 能不能自己拍板执行、提示词注入防护、给现有 agent 加工具或 skill、agent 工作流怎么测、评审 agent 项目、agent 行为异常或跑偏、agent 不调工具、agent 结论凭空出现、agent 上线后行为突然变了、怎么排查 agent 问题、怎么看 agent 的对话记录或 trace、debug agent、design agent architecture、review agent system 时使用。不用于与 Agent 架构无关的业务代码实现；不生成插件形态的 agent 配置文件（那是 agent-creator / agent-development 的职责）；不审查 Skill 本身的写法质量（那是 skill-reviewer 的职责）。
+description: 设计、编排与评审 Agentic 系统的架构原则。判断一个需求该做成纯程序、单 Agent Chat、单 Agentic、父子 Agentic 还是 Agentic 工作流，并据此设计系统提示词、工具与 Skill 体系、多 Agent 协作链路、运行时边界（终止条件、步数与成本上限、重试与幂等、记忆与租户隔离、延迟与成本预算）、安全边界（自主级别、审批闸门、注入防护）与测试评测方案；也用于在既有平台上增量新增 skill 或工具、Review 已实现的 Agent 项目，以及定位已上线 Agent 的行为异常。当用户提到 设计或编排 agent、多 agent 协作、子代理拆解、agentic 工作流、agent loop 或 harness 工程、agent 架构选型、系统提示词设计、agent 提示词太长或注意力涣散、agent 停不下来或死循环、agent 重试与超时与幂等、agent 记忆或 RAG 怎么设计、多租户数据隔离、token 成本与延迟预算、agent 输出被截断、工具或 MCP 返回太长吃满上下文、agent 能不能自己拍板执行、提示词注入防护、给现有 agent 加工具或 skill、agent 工作流怎么测、评审 agent 项目、agent 行为异常或跑偏、agent 不调工具、agent 结论凭空出现、agent 上线后行为突然变了、怎么排查 agent 问题、怎么看 agent 的对话记录或 trace、debug agent、design agent architecture、review agent system 时使用。不用于与 Agent 架构无关的业务代码实现；不生成插件形态的 agent 配置文件（那是 agent-creator / agent-development 的职责）；不审查 Skill 本身的写法质量（那是 skill-principle 的职责）。
 metadata:
   version: '0.7.0'
 ---
@@ -9,7 +9,7 @@ metadata:
 
 把一个业务意图，转成一份经过用户确认的 Agentic 方案：场景选型、Agent 与工具边界、提示词、运行时契约、上下文与并发预算、信息传递链路，并据此实现或评审已有实现。
 
-**非目标**：不替代具体业务功能的编码实现；不为"看起来更智能"而把可程序化的流程 Agent 化；不审查 Skill 本身的写法质量（交 skill-reviewer）。
+**非目标**：不替代具体业务功能的编码实现；不为"看起来更智能"而把可程序化的流程 Agent 化；不审查 Skill 本身的写法质量（交 skill-principle）。
 
 本文件：§四条入口 → §工作流（步骤 0→4，其中步骤 2.5 是 D1–D11 逐维检查）→ §基础原则 → §各场景必确认项 → §约束 → §失败处理 → §按需引用 → §验证清单（清单本体在 `references/delivery/verification.md`）。
 
@@ -295,7 +295,7 @@ metadata:
 | 已上线 Agent 出现具体行为异常，要查原因 | 走排障入口，先读对话记录（降噪成骨架）再归因；不要先改提示词，也不要直接铺开全维度评审 |
 | 排障时拿不到 agent 的对话记录 | 第一动作是把 LLM 调用出入口的完整 request/response 落盘并复现，同时按 P0 登记这项可观测性缺陷；在此之前的任何归因都标注为猜测 |
 | 排障中改了提示词后异常不再复现 | 不算定位。回到骨架找第一偏离点补证据，否则根因只是被盖住 |
-| 被要求评审的是「Skill 本身写得好不好」 | 不属于本 skill 范围，转 skill-reviewer；若该 Skill 实质是一套 Agent 编排，则本 skill 评审其架构、skill-reviewer 评审其写法，两者互补 |
+| 被要求评审的是「Skill 本身写得好不好」 | 不属于本 skill 范围，转 skill-principle；若该 Skill 实质是一套 Agent 编排，则本 skill 评审其架构、skill-principle 评审其写法，两者互补 |
 
 **维度专属的症状与处置**（产出被截断、上下文被工具打满、Agent 原地打转、重复扣款、越权检索、定位不到是哪一步坏了、增量撞上平台缺口……）写在**各维度 reference** 末尾的「常见症状」一节，随该维度一起加载（模板与清单类文件没有这一节）——按 §按需引用 的条件读到哪个维度，就带上它的症状表。
 

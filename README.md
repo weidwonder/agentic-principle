@@ -170,14 +170,14 @@ Tool names throughout are written as **capability classes** (file read, content 
 ## Install
 
 ```bash
-git clone git@github.com:weidwonder/agentic_principle.git
-cp -r agentic_principle/agentic-principle ~/.claude/skills/
+git clone git@github.com:weidwonder/agentic-principle.git
+cp -r agentic-principle/agentic-principle ~/.claude/skills/
 ```
 
 Or keep the clone where you develop and symlink the subdirectory, so `git pull` updates the installed skill:
 
 ```bash
-ln -s "$PWD/agentic_principle/agentic-principle" ~/.claude/skills/agentic-principle
+ln -s "$PWD/agentic-principle/agentic-principle" ~/.claude/skills/agentic-principle
 ```
 
 The skill directory is self-contained — no login, no third-party dependencies. `scripts/scan_agent.py` is an **optional** review accelerator using only the Python standard library; skipping it changes nothing about the skill's flow.

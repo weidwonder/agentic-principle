@@ -170,14 +170,14 @@ agentic-principle/
 ## 安装
 
 ```bash
-git clone git@github.com:weidwonder/agentic_principle.git
-cp -r agentic_principle/agentic-principle ~/.claude/skills/
+git clone git@github.com:weidwonder/agentic-principle.git
+cp -r agentic-principle/agentic-principle ~/.claude/skills/
 ```
 
 或者把 clone 留在你惯用的开发目录，软链子目录过去，这样 `git pull` 就能直接更新已安装的 skill：
 
 ```bash
-ln -s "$PWD/agentic_principle/agentic-principle" ~/.claude/skills/agentic-principle
+ln -s "$PWD/agentic-principle/agentic-principle" ~/.claude/skills/agentic-principle
 ```
 
 skill 目录自包含——无需登录、无第三方依赖。`scripts/scan_agent.py` 是评审时的**可选**加速器，只用 Python 标准库，不用它也不影响 skill 的任何流程。
@@ -196,6 +196,6 @@ skill 目录自包含——无需登录、无第三方依赖。`scripts/scan_age
 
 ## 非目标
 
-它不写你的业务代码，也不负责生成插件形态的 agent 配置文件——那是 `agent-creator` / `agent-development` 的职责。它也不审查 Skill 本身写得好不好（触发词准不准、结构合不合规、有没有孤立文档）——那是 `skill-reviewer` 的职责。两者互补：一个 Skill 若实质是一套 Agent 编排，这个 skill 审它的架构，`skill-reviewer` 审它的写法。它负责设计架构，实现交给别人。
+它不写你的业务代码，也不负责生成插件形态的 agent 配置文件——那是 `agent-creator` / `agent-development` 的职责。它也不审查 Skill 本身写得好不好（触发词准不准、结构合不合规、有没有孤立文档）——那是 `skill-principle` 的职责。两者互补：一个 Skill 若实质是一套 Agent 编排，这个 skill 审它的架构，`skill-principle` 审它的写法。它负责设计架构，实现交给别人。
 
 它也不会让你悄悄跳过核对。你可以明确要求跳过，它会照做——但会把它据以推进的每一条假设都写下来，并告诉你都是哪些。
